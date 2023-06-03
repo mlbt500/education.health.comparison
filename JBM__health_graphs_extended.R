@@ -4,7 +4,15 @@ library(dplyr)
 # Read data
 OECD_health <- read.csv(".\\data\\health_OECD.csv") # health spend data
 OECD_education <- read.csv(".\\data\\Education_OECD.csv") # education spend data
-OECD_mortality <- read.csv(".\\data\\OECD_mortality.csv")
+OECD_mortality <- read.csv(".\\data\\OECD_mortality.csv") ## treatable and preventable mortality
+PIRLS <- read.csv(".\\data\\PIRLS_2021.csv")
+TIMSS_S8 <- read.csv(".\\data\\TIMSS_S_8_2019.csv")
+TIMSS_M8 <- read.csv(".\\data\\TIMSS_M_8_2019.csv")
+TIMSS_S4 <- read.csv(".\\data\\TIMSS_S_4_2019.csv")
+TIMSS_M4 <- read.csv(".\\data\\TIMSS_M_4_2019.csv")
+PISA <- read.csv(".\\data\\PISA.csv")
+
+
 
 # Define JBM peers
 JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE", "USA")  # I added AUS
@@ -19,8 +27,8 @@ OECD_health_total <- OECD_health[OECD_health$SUBJECT == "TOT" & OECD_health$MEAS
 OECD_health_total <- OECD_health_total[,c(1,6:7)]
 
 
-# Total primary education spending (%GDP)
-primary_ed <- OECD_education[OECD_education$LOCATION %in% JBM_peers & OECD_education$SUBJECT == "PRY" & OECD_education$MEASURE == "PC_GDP",]
+# Total primary to non-non-tertiary education spending (%GDP)
+primary_ed <- OECD_education[OECD_education$LOCATION %in% JBM_peers & OECD_education$SUBJECT == "PRY_NTRY" & OECD_education$MEASURE == "PC_GDP",]
 primary_ed <- primary_ed[,c(1, 6, 7)]
 
 # Preventable mortality
@@ -36,4 +44,45 @@ treatable <- OECD_mortality[OECD_mortality$Variable == "Treatable mortality" & O
 treatable <- treatable[,c(5,7,9)]
 treatable_TabPeers <- treatable[treatable$COU %in% c("GBR", "POL", "SVN"),]
 treatable_JBM <- treatable[treatable$COU %in% JBM_peers, ]
+
+# International Education Rankings (PIRLS, TIMMS, PISA)
+
+PIRLS1 <- PIRLS[-c(1:7, 44, 48:61),-c(1,2,4,6,8,10,12:29)]
+PIRLS1[1,1] <- "Country"
+names <- PIRLS1[1,]
+PIRLS2 <- PIRLS1[-1,]
+colnames(PIRLS2) <- names
+rownames(PIRLS2) <- NULL
+
+JBM_peers_proxy <- c("England ⋈", "Austria", "Denmark", "Germany", "Finland", "France", "Netherlands", "Norway (5)", "Sweden")
+PIRLS_JBM <- PIRLS2[PIRLS2$Country %in% JBM_peers_proxy, ]
+PIRLS_JBM
+
+TIMSS_S8_1 <- TIMSS_S8[-c(1:4,6,51:111),-c(1,4,6,8,10,12,14,16, 18:30),]
+names <- TIMSS_S8_1[1,]
+TIMSS_S8_2 <- TIMSS_S8_1[-1,]
+colnames(TIMSS_S8_2) <- names
+rownames(TIMSS_S8_2) <- NULL
+TIMSS_S8_2
+
+TIMSS_M8_1 <- TIMSS_M8[-c(1:4,6,51:111),-c(1,4,6,8,10,12,14,16, 18:30),]
+names <- TIMSS_M8_1[1,]
+TIMSS_M8_2 <- TIMSS_M8_1[-1,]
+colnames(TIMSS_M8_2) <- names
+rownames(TIMSS_M8_2) <- NULL
+TIMSS_M8_2
+
+TIMSS_S4_1 <- TIMSS_S4[-c(1:4,6,51:111),-c(1,2,5,7,9,11,13,15, 16:28),]
+names <- TIMSS_S4_1[1,]
+TIMSS_S4_2 <- TIMSS_S4_1[-1,]
+colnames(TIMSS_S4_2) <- names
+rownames(TIMSS_S4_2) <- NULL
+TIMSS_S4_2
+
+TIMSS_M4_1 <- TIMSS_M4[-c(1:4,6,51:111),-c(1,4,6,8,10,12,14,16, 18:30),]
+names <- TIMSS_M4_1[1,]
+TIMSS_M4_2 <- TIMSS_M4_1[-1,]
+colnames(TIMSS_M4_2) <- names
+rownames(TIMSS_M4_2) <- NULL
+TIMSS_M4_2
 

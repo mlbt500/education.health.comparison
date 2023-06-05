@@ -41,7 +41,7 @@ ggplot() +
   geom_point(data = OECD_health_JBM, aes(x = TIME, y = Value, color = LOCATION)) +
   scale_color_manual(values = c("GBR" = "red", "grey")) +
   labs(x = "Year", y = "Value") +
-  ggtitle("JBM graph") +
+  ggtitle("JBM graph -- compulsory spending on health (%GDP)") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
@@ -49,23 +49,93 @@ ggplot(OECD_health_TAB, aes(x = TIME, y = Value, color = LOCATION, group = LOCAT
   geom_line() +
   geom_point() +
   labs(x = "Year", y = "Value") +
-  ggtitle("Alex Tabarrok") +
+  ggtitle("Alex Tabarrok -- compulsory spending on health (%GDP)") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
   
 
 # Total health (%GDP)
-OECD_health_total <- OECD_health[OECD_health$SUBJECT == "TOT" & OECD_health$MEASURE == "PC_GDP"  & OECD_health$LOCATION  %in% JBM_peers & OECD_health$TIME %in% 2000:2019,]
-OECD_health_total <- OECD_health_total[,c(1,6:7)]
+OECD_health_total <- OECD_health[OECD_health$SUBJECT == "TOT" & OECD_health$MEASURE == "PC_GDP" & OECD_health$TIME %in% 2000:2019,]
+OECD_health_total_JBM <- OECD_health_total[OECD_health_total$LOCATION  %in% JBM_peers, ]
+OECD_health_total_JBM <- OECD_health_total_JBM[,c(1,6:7)]
+OECD_health_TAB <- OECD_health_total[OECD_health_total$LOCATION %in% c("GBR", "POL", "SVN"),]
+
+agg_data <- OECD_health_total_JBM %>%
+  group_by(TIME) %>%
+  summarise(mean_value = mean(Value),
+            min_value = min(Value),
+            max_value = max(Value))
+
+ggplot() +
+  geom_ribbon(data = agg_data, aes(x = TIME, ymin = min_value, ymax = max_value),
+              fill = "darkgrey", alpha = 0.2) +
+  geom_line(data = OECD_health_total_JBM, aes(x = TIME, y = Value, color = LOCATION), size = 1.5) +
+  geom_line(data = agg_data, aes(x = TIME, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_point(data = OECD_health_total_JBM, aes(x = TIME, y = Value, color = LOCATION)) +
+  scale_color_manual(values = c("GBR" = "red", "grey")) +
+  labs(x = "Year", y = "Value") +
+  ggtitle("JBM peers -- total spending on health (%GDP)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+
+ggplot(OECD_health_TAB, aes(x = TIME, y = Value, color = LOCATION, group = LOCATION)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("Alex Tabarrok peers -- total spending on health (%GDP)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 # Total primary to non-non-tertiary education spending (%GDP)
-ed <- OECD_education[OECD_education$LOCATION %in% JBM_peers & OECD_education$SUBJECT == "PRY_NTRY" & OECD_education$MEASURE == "PC_GDP",]
+JBM_peers_proxy <- JBM_peers_proxy <- c("GBR", "CAN", "DNK", "FIN", "FRA", "NLD", "NOR", "SWE", "USA")
+ed <- OECD_education[OECD_education$LOCATION %in% JBM_peers_proxy & OECD_education$SUBJECT == "PRY_NTRY" & OECD_education$MEASURE == "PC_GDP" & OECD_education$TIME %in% 2005:2019,]
 ed <- ed[,c(1, 6, 7)]
+
+agg_data <- ed %>%
+  group_by(TIME) %>%
+  summarise(mean_value = mean(Value),
+            min_value = min(Value),
+            max_value = max(Value))
+
+ggplot() +
+  geom_ribbon(data = agg_data, aes(x = TIME, ymin = min_value, ymax = max_value),
+              fill = "darkgrey", alpha = 0.2) +
+  geom_line(data = ed, aes(x = TIME, y = Value, color = LOCATION), size = 1.5) +
+  geom_line(data = agg_data, aes(x = TIME, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_point(data = ed, aes(x = TIME, y = Value, color = LOCATION)) +
+  scale_color_manual(values = c("GBR" = "red", "grey")) +
+  labs(x = "Year", y = "Value") +
+  ggtitle("JBM peers -- Total primary to non-non-tertiary education spending (%GDP)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+
 
 #Total primary education spending 
 
-primary_ed <- OECD_education[OECD_education$LOCATION %in% JBM_peers & OECD_education$SUBJECT == "PRY"& OECD_education$MEASURE == "PC_GDP",]
+JBM_peers_proxy <- JBM_peers <- c("GBR", "CAN", "DNK", "FIN", "FRA", "NLD", "NOR", "SWE", "USA")
+primary_ed <- OECD_education[OECD_education$LOCATION %in% JBM_peers_proxy & OECD_education$SUBJECT == "PRY" & OECD_education$MEASURE == "PC_GDP" & OECD_education$TIME %in% 2005:2019,]
 primary_ed <- primary_ed[,c(1,6,7)]
+primary_ed
+
+agg_data <- primary_ed %>%
+  group_by(TIME) %>%
+  summarise(mean_value = mean(Value),
+            min_value = min(Value),
+            max_value = max(Value))
+
+ggplot() +
+  geom_ribbon(data = agg_data, aes(x = TIME, ymin = min_value, ymax = max_value),
+              fill = "darkgrey", alpha = 0.2) +
+  geom_line(data = primary_ed, aes(x = TIME, y = Value, color = LOCATION), size = 1.5) +
+  geom_line(data = agg_data, aes(x = TIME, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_point(data = primary_ed, aes(x = TIME, y = Value, color = LOCATION)) +
+  scale_color_manual(values = c("GBR" = "red", "grey")) +
+  labs(x = "Year", y = "Value") +
+  ggtitle("JBM peers -- primary education (%GDP)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 # Preventable mortality
 

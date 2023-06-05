@@ -222,7 +222,7 @@ ggplot(PIRLS_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
   geom_line() +
   geom_point() +
   labs(x = "Year", y = "Value") +
-  ggtitle("Alex Tabarrok peers -- total spending on health (%GDP)") +
+  ggtitle("PIRLS reading age 10 -- JBM Peers.. ish") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 

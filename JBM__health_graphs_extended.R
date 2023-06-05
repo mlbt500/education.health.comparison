@@ -114,7 +114,7 @@ ggplot() +
 
 #Total primary education spending 
 
-JBM_peers_proxy <- JBM_peers <- c("GBR", "CAN", "DNK", "FIN", "FRA", "NLD", "NOR", "SWE", "USA")
+JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE")
 primary_ed <- OECD_education[OECD_education$LOCATION %in% JBM_peers_proxy & OECD_education$SUBJECT == "PRY" & OECD_education$MEASURE == "PC_GDP" & OECD_education$TIME %in% 2005:2019,]
 primary_ed <- primary_ed[,c(1,6,7)]
 primary_ed
@@ -137,19 +137,71 @@ ggplot() +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
-# Preventable mortality
+# Avoidable mortality
+JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE")
+avoidable <- OECD_mortality[OECD_mortality$Variable == "Avoidable mortality (preventable+treatable)" & OECD_mortality$Measure == "Deaths per 100 000 population (standardised rates)",]
+avoidable <- avoidable[,c(5,7,9)]
+avoidable_TAB <- avoidable[avoidable$COU %in% c("GBR", "POL", "SVN"),]
+avoidable_JBM <- avoidable[avoidable$COU %in% JBM_peers, ]
 
-preventable <- OECD_mortality[OECD_mortality$Variable == "Preventable mortality" & OECD_mortality$Measure == "Deaths per 100 000 population (standardised rates)",]
-preventable <- preventable[,c(5,7,9)]
-preventable_AT <- preventable[preventable$COU %in% c("GBR", "POL", "SVN"),]
-preventable_JBM <- preventable[preventable$COU %in% JBM_peers, ]
+agg_data <- avoidable_JBM %>%
+  group_by(YEA) %>%
+  summarise(mean_value = mean(Value),
+            min_value = min(Value),
+            max_value = max(Value))
+
+ggplot() +
+  geom_ribbon(data = agg_data, aes(x = YEA, ymin = min_value, ymax = max_value),
+              fill = "darkgrey", alpha = 0.2) +
+  geom_line(data = avoidable_JBM, aes(x = YEA, y = Value, color = COU), size = 1.5) +
+  geom_line(data = agg_data, aes(x = YEA, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_point(data = avoidable_JBM, aes(x = YEA, y = Value, color = COU)) +
+  scale_color_manual(values = c("GBR" = "red", "grey")) +
+  labs(x = "Year", y = "Value") +
+  ggtitle("Avoidable deaths (per 100,000)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+ggplot(avoidable_TAB, aes(x = YEA, y = Value, color = COU, group = COU)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("Alex Tabarrok peers -- total spending on health (%GDP)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 # Treatable mortality
-
+JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE")
 treatable <- OECD_mortality[OECD_mortality$Variable == "Treatable mortality" & OECD_mortality$Measure == "Deaths per 100 000 population (standardised rates)",]
 treatable <- treatable[,c(5,7,9)]
-treatable_TabPeers <- treatable[treatable$COU %in% c("GBR", "POL", "SVN"),]
+treatable_TAB <- treatable[treatable$COU %in% c("GBR", "POL", "SVN"),]
 treatable_JBM <- treatable[treatable$COU %in% JBM_peers, ]
+
+agg_data <- treatable_JBM %>%
+  group_by(YEA) %>%
+  summarise(mean_value = mean(Value),
+            min_value = min(Value),
+            max_value = max(Value))
+
+ggplot() +
+  geom_ribbon(data = agg_data, aes(x = YEA, ymin = min_value, ymax = max_value),
+              fill = "darkgrey", alpha = 0.2) +
+  geom_line(data = treatable_JBM, aes(x = YEA, y = Value, color = COU), size = 1.5) +
+  geom_line(data = agg_data, aes(x = YEA, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_point(data = treatable_JBM, aes(x = YEA, y = Value, color = COU)) +
+  scale_color_manual(values = c("GBR" = "red", "grey")) +
+  labs(x = "Year", y = "Value") +
+  ggtitle("Treatable deaths (per 100,000)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+ggplot(treatable_TAB, aes(x = YEA, y = Value, color = COU, group = COU)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("Alex Tabarrok peers -- total spending on health (%GDP)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 # International Education Rankings (PIRLS, TIMMS, PISA)
 
@@ -164,7 +216,15 @@ PIRLS2 <- PIRLS2 %>%
 PIRLS3 <- PIRLS2 %>%
   pivot_longer(cols = -Country, names_to = "Year", values_to = "Value")
 JBM_peers_proxy <- c("England ⋈", "Austria", "Denmark", "Germany", "Finland", "France", "Netherlands", "Norway (5)", "Sweden")
+PIRLS_JBM <- PIRLS3[PIRLS3$Country %in% JBM_peers_proxy, ]
 
+ggplot(PIRLS_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
+  geom_line() +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("Alex Tabarrok peers -- total spending on health (%GDP)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 TIMSS_S8_1 <- TIMSS_S8[-c(1:4,6,46,51:111),-c(1,2,4,6,8,10,12,14,16, 18:30),]
 names <- TIMSS_S8_1[1,]
@@ -175,6 +235,7 @@ TIMSS_S8_3 <- TIMSS_S8_2 %>%
   pivot_longer(cols = -Country, names_to = "Year", values_to = "Value")
 JBM_peers_proxy <- c("England", "Finland", "France", "Norway (9)", "Sweden", "United States")
 TIMSS_S8_JBM <- TIMSS_S8_3[TIMSS_S8_3$Country %in% JBM_peers_proxy, ]
+
 
 TIMSS_M8_1 <- TIMSS_M8[-c(1:4,6,46,51:111),-c(1,2,4,6,8,10,12,14,16, 18:30),]
 names <- TIMSS_M8_1[1,]
@@ -256,8 +317,6 @@ UK_PISA_R$Study <- "UK PISA Reading"
 colnames(UK_PISA_R)[1] <- "Year"
 UK_PISA_R <- UK_PISA_R[, c("Country", "Year", "Value", "Study")]
 
-UK_PISA_R
-
 England_PIRLS <-  PIRLS3[PIRLS3$Country == "England ⋈", ]
 England_PIRLS$Study <- "England PIRLS"
 England_PIRLS
@@ -284,6 +343,7 @@ ggplot(COE, aes(x = Year, y = Value, color = Study, group = Study)) +
   geom_line() +
   geom_point() +
   labs(x = "Year", y = "Value") +
-  ggtitle("Robert Coe graph reproduced in Dominic Cummings blog -- extended for Coalition/Con governments") +
+  ggtitle("Robert Coe graph -- extended for Coalition/Con governments") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+

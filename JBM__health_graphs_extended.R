@@ -4,6 +4,7 @@ library(tidyr)
 library(tidyverse)
 
 ##read data
+
 OECD_health <- read.csv(".\\data\\health_OECD.csv") # health spend data
 OECD_education <- read.csv(".\\data\\Education_OECD.csv") # education spend data
 OECD_mortality <- read.csv(".\\data\\OECD_mortality.csv") ## treatable and preventable mortality
@@ -215,16 +216,19 @@ PIRLS2 <- PIRLS2 %>%
   mutate(across(starts_with("20"), as.character))
 PIRLS3 <- PIRLS2 %>%
   pivot_longer(cols = -Country, names_to = "Year", values_to = "Value")
-JBM_peers_proxy <- c("England ⋈", "Austria", "Denmark", "Germany", "Finland", "France", "Netherlands", "Norway (5)", "Sweden")
+JBM_peers_proxy <- c("England ⋈", "Austria", "Denmark", "Germany", "Finland", "France", "Netherlands", "Norway (5)", "Sweden", "United States")
 PIRLS_JBM <- PIRLS3[PIRLS3$Country %in% JBM_peers_proxy, ]
+PIRLS_JBM <- PIRLS_JBM[!is.na(PIRLS_JBM$Value), ]
 
 ggplot(PIRLS_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
-  geom_line() +
+  geom_line(data = subset(PIRLS_JBM, Country != "England"), size = 1) +
+  geom_line(data = subset(PIRLS_JBM, Country == "England"), size = 1.5) +
   geom_point() +
   labs(x = "Year", y = "Value") +
   ggtitle("PIRLS reading age 10 -- JBM Peers.. ish") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
 
 TIMSS_S8_1 <- TIMSS_S8[-c(1:4,6,46,51:111),-c(1,2,4,6,8,10,12,14,16, 18:30),]
 names <- TIMSS_S8_1[1,]
@@ -233,10 +237,19 @@ colnames(TIMSS_S8_2) <- names
 rownames(TIMSS_S8_2) <- NULL
 TIMSS_S8_3 <- TIMSS_S8_2 %>%
   pivot_longer(cols = -Country, names_to = "Year", values_to = "Value")
-JBM_peers_proxy <- c("England", "Finland", "France", "Norway (9)", "Sweden", "United States")
+JBM_peers_proxy <- c("Austria", "England", "Finland", "Denmark" "France", "Netherlands" "Norway (9)", "Sweden", "United States")
 TIMSS_S8_JBM <- TIMSS_S8_3[TIMSS_S8_3$Country %in% JBM_peers_proxy, ]
+TIMSS_S8_JBM <- TIMSS_S8_JBM[!is.na(TIMSS_S8_JBM$Value), ]
 
-
+ggplot(TIMSS_S8_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
+  geom_line(data = subset(TIMSS_S8_JBM, Country != "England"), size = 1) +
+  geom_line(data = subset(TIMSS_S8_JBM, Country == "England"), size = 1.5) +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("TIMSS Science Age 14") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  
 TIMSS_M8_1 <- TIMSS_M8[-c(1:4,6,46,51:111),-c(1,2,4,6,8,10,12,14,16, 18:30),]
 names <- TIMSS_M8_1[1,]
 TIMSS_M8_2 <- TIMSS_M8_1[-1,]
@@ -245,8 +258,18 @@ rownames(TIMSS_M8_2) <- NULL
 JBM_peers_proxy <- c("England", "Finland", "France", "Norway (9)", "Sweden", "United States")
 TIMSS_M8_3 <- TIMSS_M8_2 %>%
   pivot_longer(cols = -Country, names_to = "Year", values_to = "Value")
-JBM_peers_proxy <- c("England", "Finland", "France", "Norway (9)", "Sweden", "United States")
+JBM_peers_proxy <- c("Austria", "England", "Finland", "France", "Denmark", "Norway (9)", "Sweden", "United States")
 TIMSS_M8_JBM <- TIMSS_M8_3[TIMSS_M8_3$Country %in% JBM_peers_proxy, ]
+TIMSS_M8_JBM <- TIMSS_M8_JBM[!is.na(TIMSS_M8_JBM$Value), ]
+
+ggplot(TIMSS_M8_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
+  geom_line(data = subset(TIMSS_M8_JBM, Country != "England"), size = 1) +
+  geom_line(data = subset(TIMSS_M8_JBM, Country == "England"), size = 1.5) +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("TIMSS Maths Age 14") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 TIMSS_S4_1 <- TIMSS_S4[-c(1:4,6,51:111),-c(1,2,5,7,9,11,13,15, 16:28),]
 names <- TIMSS_S4_1[1,]
@@ -255,8 +278,18 @@ colnames(TIMSS_S4_2) <- names
 rownames(TIMSS_S4_2) <- NULL
 TIMSS_S4_3 <- TIMSS_S4_2 %>%
   pivot_longer(cols = -Country, names_to = "Year", values_to = "Value")
-JBM_peers_proxy <- c("England", "Finland", "France", "Norway (9)", "Sweden", "United States")
+JBM_peers_proxy <- c("Austria", "England", "Finland", "Germany", "Netherlands", "Denmark", "France", "Norway (5)", "Sweden", "United States")
 TIMSS_S4_JBM <- TIMSS_S4_3[TIMSS_S4_3$Country %in% JBM_peers_proxy, ]
+TIMSS_S4_JBM <- TIMSS_S4_JBM[!is.na(TIMSS_S4_JBM$Value), ]
+
+ggplot(TIMSS_S4_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
+  geom_line(data = subset(TIMSS_S4_JBM, Country != "England"), size = 1) +
+  geom_line(data = subset(TIMSS_S4_JBM, Country == "England"), size = 1.5) +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("TIMSS Science Age 10") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 TIMSS_M4_1 <- TIMSS_M4[-c(1:4,6,51:111),-c(1,2,4,6,8,10,12,14,16, 18:30),]
 names <- TIMSS_M4_1[1,]
@@ -265,8 +298,18 @@ colnames(TIMSS_M4_2) <- names
 rownames(TIMSS_M4_2) <- NULL
 TIMSS_M4_3 <- TIMSS_M4_2 %>%
   pivot_longer(cols = -Country, names_to = "Year", values_to = "Value")
-JBM_peers_proxy <- c("England", "Finland", "France", "Norway (9)", "Sweden", "United States")
+JBM_peers_proxy <- c("Austria", "England", "Finland", "France", "Norway (5)", "Denmark", "Netherlands", "Sweden", "United States")
 TIMSS_M4_JBM <- TIMSS_M4_3[TIMSS_M4_3$Country %in% JBM_peers_proxy, ]
+TIMSS_M4_JBM <- TIMSS_M4_JBM[!is.na(TIMSS_M4_JBM$Value), ]
+
+ggplot(TIMSS_M4_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
+  geom_line(data = subset(TIMSS_M4_JBM, Country != "England"), size = 1) +
+  geom_line(data = subset(TIMSS_M4_JBM, Country == "England"), size = 1.5) +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("TIMSS Maths Age 10") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 PISA_R1 <- PISA_R[-c(1:8),1:3]
 colnames(PISA_R1) <- PISA_R1[1,]
@@ -281,6 +324,19 @@ PISA_R3 <- PISA_R2 %>%
   fill("Year/Study", .direction = "down")
 JBM_peers <- c("United Kingdom", "Austria", "Canada", "Denmark", "Germany", "Finland", "France", "Netherlands", "Norway", "Sweden", "Switzerland", "United States")
 PISA_R_JBM <- PISA_R3[PISA_R3$Country %in% JBM_peers,]
+PISA_R_JBM <- PISA_R_JBM %>%
+  mutate(Value = as.numeric(Value))
+PISA_R_JBM <- PISA_R_JBM[!is.na(PISA_R_JBM$Value), ]
+colnames(PISA_R_JBM) <- c("Year", "Country", "Value")
+
+ggplot(PISA_R_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
+  geom_line(data = subset(PISA_R_JBM, Country != "United Kingdom"), size = 1) +
+  geom_line(data = subset(PISA_R_JBM, Country == "United Kingdom"), size = 1.5) +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("PISA reading -- age 15") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 PISA_S1 <- PISA_S[-c(1:8), 1:3]
 colnames(PISA_S1) <- c("Year/Study", "Country", "Value")
@@ -290,6 +346,19 @@ PISA_S3 <- PISA_S2 %>%
   fill("Year/Study", .direction = "down")
 JBM_peers <- c("United Kingdom", "Austria", "Canada", "Denmark", "Germany", "Finland", "France", "Netherlands", "Norway", "Sweden", "Switzerland", "United States")
 PISA_S_JBM <- PISA_S3[PISA_S3$Country %in% JBM_peers,]
+PISA_S_JBM <- PISA_S_JBM %>%
+  mutate(Value = as.numeric(Value))
+PISA_S_JBM <- PISA_S_JBM[!is.na(PISA_S_JBM$Value), ]
+colnames(PISA_S_JBM) <- c("Year", "Country", "Value")
+
+ggplot(PISA_S_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
+  geom_line(data = subset(PISA_S_JBM, Country != "United Kingdom"), size = 1) +
+  geom_line(data = subset(PISA_S_JBM, Country == "United Kingdom"), size = 1.5) +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("PISA Science") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 PISA_M1 <- PISA_M[-c(1:8), 1:3]
 colnames(PISA_M1) <- c("Year/Study", "Country", "Value")
@@ -299,6 +368,19 @@ PISA_M3 <- PISA_M2 %>%
   fill("Year/Study", .direction = "down")
 JBM_peers <- c("United Kingdom", "Austria", "Canada", "Denmark", "Germany", "Finland", "France", "Netherlands", "Norway", "Sweden", "Switzerland", "United States")
 PISA_M_JBM <- PISA_M3[PISA_M3$Country %in% JBM_peers,]
+PISA_M_JBM <- PISA_M_JBM %>%
+  mutate(Value = as.numeric(Value))
+PISA_M_JBM <- PISA_M_JBM[!is.na(PISA_S_JBM$Value), ]
+colnames(PISA_M_JBM) <- c("Year", "Country", "Value")
+
+ggplot(PISA_M_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
+  geom_line(data = subset(PISA_M_JBM, Country != "United Kingdom"), size = 1) +
+  geom_line(data = subset(PISA_M_JBM, Country == "United Kingdom"), size = 1.5) +
+  geom_point() +
+  labs(x = "Year", y = "Value") +
+  ggtitle("PISA Maths -- age 10") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 
 # Coe reproduced in Dominic Cummings blog post on 
 

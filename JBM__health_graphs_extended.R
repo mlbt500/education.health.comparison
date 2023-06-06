@@ -237,7 +237,7 @@ colnames(TIMSS_S8_2) <- names
 rownames(TIMSS_S8_2) <- NULL
 TIMSS_S8_3 <- TIMSS_S8_2 %>%
   pivot_longer(cols = -Country, names_to = "Year", values_to = "Value")
-JBM_peers_proxy <- c("Austria", "England", "Finland", "Denmark" "France", "Netherlands" "Norway (9)", "Sweden", "United States")
+JBM_peers_proxy <- c("Austria", "England", "Finland", "Denmark", "France", "Netherlands", "Norway (9)", "Sweden", "United States")
 TIMSS_S8_JBM <- TIMSS_S8_3[TIMSS_S8_3$Country %in% JBM_peers_proxy, ]
 TIMSS_S8_JBM <- TIMSS_S8_JBM[!is.na(TIMSS_S8_JBM$Value), ]
 

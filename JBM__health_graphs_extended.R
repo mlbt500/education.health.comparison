@@ -33,18 +33,26 @@ agg_data <- OECD_health_JBM %>%
   summarise(mean_value = mean(Value),
             min_value = min(Value),
             max_value = max(Value))
+# Create a new variable 'LineType' in 'agg_data' for legend display
+agg_data <- agg_data %>%
+  mutate(LineType = "Mean")
 
+# Plot
 ggplot() +
   geom_ribbon(data = agg_data, aes(x = TIME, ymin = min_value, ymax = max_value),
               fill = "darkgrey", alpha = 0.2) +
   geom_line(data = OECD_health_JBM, aes(x = TIME, y = Value, color = LOCATION), size = 1.5) +
-  geom_line(data = agg_data, aes(x = TIME, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_line(data = agg_data, aes(x = TIME, y = mean_value, color = "Mean"), linetype = "dashed", size = 1.5) +
   geom_point(data = OECD_health_JBM, aes(x = TIME, y = Value, color = LOCATION)) +
-  scale_color_manual(values = c("GBR" = "red", "grey")) +
-  labs(x = "Year", y = "Value") +
+  scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
+  labs(x = "Year", y = "Value", color = "COU") +
   ggtitle("JBM graph -- compulsory spending on health (%GDP)") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
+           label = "Countries: AUT, CAN, DNK, FIN, FRA, DEU, NLD, NOR, SWE, CHE, GBR",
+           size = 3)
+
 
 ggplot(OECD_health_TAB, aes(x = TIME, y = Value, color = LOCATION, group = LOCATION)) +
   geom_line() +
@@ -71,13 +79,16 @@ ggplot() +
   geom_ribbon(data = agg_data, aes(x = TIME, ymin = min_value, ymax = max_value),
               fill = "darkgrey", alpha = 0.2) +
   geom_line(data = OECD_health_total_JBM, aes(x = TIME, y = Value, color = LOCATION), size = 1.5) +
-  geom_line(data = agg_data, aes(x = TIME, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_line(data = agg_data, aes(x = TIME, y = mean_value, color = "Mean"), linetype = "dashed", size = 1.5) +
   geom_point(data = OECD_health_total_JBM, aes(x = TIME, y = Value, color = LOCATION)) +
-  scale_color_manual(values = c("GBR" = "red", "grey")) +
-  labs(x = "Year", y = "Value") +
+  scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
+  labs(x = "Year", y = "Value", color = "COU") +
   ggtitle("JBM peers -- total spending on health (%GDP)") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
+           label = "Countries: AUT, CAN, DNK, FIN, FRA, DEU, NLD, NOR, SWE, CHE, GBR",
+           size = 3)
 
 
 ggplot(OECD_health_TAB, aes(x = TIME, y = Value, color = LOCATION, group = LOCATION)) +
@@ -130,13 +141,16 @@ ggplot() +
   geom_ribbon(data = agg_data, aes(x = TIME, ymin = min_value, ymax = max_value),
               fill = "darkgrey", alpha = 0.2) +
   geom_line(data = primary_ed, aes(x = TIME, y = Value, color = LOCATION), size = 1.5) +
-  geom_line(data = agg_data, aes(x = TIME, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_line(data = agg_data, aes(x = TIME, y = mean_value, color = "Mean"), linetype = "dashed", size = 1.5) +
   geom_point(data = primary_ed, aes(x = TIME, y = Value, color = LOCATION)) +
-  scale_color_manual(values = c("GBR" = "red", "grey")) +
-  labs(x = "Year", y = "Value") +
+  scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
+  labs(x = "Year", y = "Value", color = "COU") +
   ggtitle("JBM peers -- primary education (%GDP)") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
+           label = "Countries: AUT, CAN, DNK, DEU, FIN, FRA, NLD, NOR, SWE, CHE, GBR",
+           size = 3)
 
 # Avoidable mortality
 JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE")
@@ -155,13 +169,16 @@ ggplot() +
   geom_ribbon(data = agg_data, aes(x = YEA, ymin = min_value, ymax = max_value),
               fill = "darkgrey", alpha = 0.2) +
   geom_line(data = avoidable_JBM, aes(x = YEA, y = Value, color = COU), size = 1.5) +
-  geom_line(data = agg_data, aes(x = YEA, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_line(data = agg_data, aes(x = YEA, y = mean_value, color = "Mean"), linetype = "dashed", size = 1.5) +
   geom_point(data = avoidable_JBM, aes(x = YEA, y = Value, color = COU)) +
-  scale_color_manual(values = c("GBR" = "red", "grey")) +
-  labs(x = "Year", y = "Value") +
+  scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
+  labs(x = "Year", y = "Value", color = "COU") +
   ggtitle("Avoidable deaths (per 100,000)") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
+           label = "Countries: AUT, CAN, DNK, DEU, FIN, FRA, NLD, NOR, SWE, CHE, GBR",
+           size = 3)
 
 ggplot(avoidable_TAB, aes(x = YEA, y = Value, color = COU, group = COU)) +
   geom_line() +
@@ -188,13 +205,16 @@ ggplot() +
   geom_ribbon(data = agg_data, aes(x = YEA, ymin = min_value, ymax = max_value),
               fill = "darkgrey", alpha = 0.2) +
   geom_line(data = treatable_JBM, aes(x = YEA, y = Value, color = COU), size = 1.5) +
-  geom_line(data = agg_data, aes(x = YEA, y = mean_value), linetype = "dashed", color = "black", size = 1.5) +
+  geom_line(data = agg_data, aes(x = YEA, y = mean_value, color = "Mean"), linetype = "dashed", size = 1.5) +
   geom_point(data = treatable_JBM, aes(x = YEA, y = Value, color = COU)) +
-  scale_color_manual(values = c("GBR" = "red", "grey")) +
-  labs(x = "Year", y = "Value") +
+  scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
+  labs(x = "Year", y = "Value", color = "COU") +
   ggtitle("Treatable deaths (per 100,000)") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
+           label = "Countries: AUT, CAN, DNK, DEU, FIN, FRA, NLD, NOR, SWE, CHE, GBR",
+           size = 3)
 
 ggplot(treatable_TAB, aes(x = YEA, y = Value, color = COU, group = COU)) +
   geom_line() +
@@ -220,15 +240,18 @@ JBM_peers_proxy <- c("England ⋈", "Austria", "Denmark", "Germany", "Finland", 
 PIRLS_JBM <- PIRLS3[PIRLS3$Country %in% JBM_peers_proxy, ]
 PIRLS_JBM <- PIRLS_JBM[!is.na(PIRLS_JBM$Value), ]
 
-ggplot(PIRLS_JBM, aes(x = Year, y = Value, color = Country, group = Country)) +
-  geom_line(data = subset(PIRLS_JBM, Country != "England"), size = 1) +
-  geom_line(data = subset(PIRLS_JBM, Country == "England"), size = 1.5) +
-  geom_point() +
+ggplot(PIRLS_JBM, aes(x = Year, y = Value, group = Country)) +
+  geom_line(data = subset(PIRLS_JBM, Country != "England ⋈"), aes(color = "Other"), size = 1) +
+  geom_line(data = subset(PIRLS_JBM, Country == "England ⋈"), aes(color = "England"), size = 1) +
+  geom_point(aes(color = Country)) +
   labs(x = "Year", y = "Value") +
   ggtitle("PIRLS reading age 10 -- JBM Peers.. ish") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
-
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  scale_color_manual(name = "Country", 
+                     values = c("England" = "red", "Other" = "grey")) +
+  annotate("text", x = Inf, y = -Inf, label = paste("Countries: ", paste(unique(PIRLS_JBM$Country), collapse = ", ")), 
+           hjust = 1, vjust = -1, size = 2, color = "black")
 
 TIMSS_S8_1 <- TIMSS_S8[-c(1:4,6,46,51:111),-c(1,2,4,6,8,10,12,14,16, 18:30),]
 names <- TIMSS_S8_1[1,]

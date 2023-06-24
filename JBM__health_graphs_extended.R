@@ -534,14 +534,9 @@ WB_PPP2 <- WB_PPP1[-1,]
 colnames(WB_PPP2) <- col_names
 WB_PPP3 <- WB_PPP2[WB_PPP2$`Country Code` %in% JBM_peers,]
 WB_PPP4 <- WB_PPP3 %>% pivot_longer(cols = -1, names_to = "Year", values_to = "Value")
-average_df <- WB_PPP4 %>%
-  group_by(Year) %>%
-  summarise(Value = mean(Value, na.rm = TRUE)) %>%
-  mutate("Country Code" = "Ave")
-WB_PPP5 <- rbind(WB_PPP4, average_df)
+colnames(WB_PPP4) <- c("LOCATION", "Year", "Value")
 
-# Group and summarize the data
-agg_data <- WB_PPP5 %>%
+agg_data <- WB_PPP4 %>%
   group_by(Year) %>%
   summarise(mean_value = mean(Value),
             min_value = min(Value),
@@ -551,23 +546,18 @@ agg_data <- WB_PPP5 %>%
 agg_data <- agg_data %>%
   mutate(LineType = "Mean")
 
-# Create a filter for the countries of interest
-countries_of_interest <- c("GBR")
-
-# Filter the data for the countries of interest
-filtered_data <- WB_PPP5 %>%
-  filter(`Country Code` %in% countries_of_interest)
-
 # Plot
 ggplot() +
-  geom_line(data = filtered_data, aes(x = Year, y = Value, color = `Country Code`), size = 1.5) +
-  geom_point(data = filtered_data, aes(x = Year, y = Value, color = `Country Code`)) +
-  geom_line(data = agg_data, aes(x = Year, y = mean_value, color = LineType), linetype = "dashed", size = 1.5) +
+  geom_ribbon(data = agg_data, aes(x = Year, ymin = min_value, ymax = max_value),
+              fill = "darkgrey", alpha = 0.2) +
+  geom_line(data = in_pat2, aes(x = Year, y = Value, color = LOCATION), size = 1.5) +
+  geom_line(data = agg_data, aes(x = Year, y = mean_value, color = "Mean"), linetype = "dashed", size = 1.5) +
+  geom_point(data = in_pat2, aes(x = Year, y = Value, color = LOCATION)) +
   scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
-  labs(x = "Year", y = "Value", color = "Country Code") +
-  ggtitle("Health Spending Per Capita, PPP") +
+  labs(x = "Year", y = "Value", color = "LOCATION") +
+  ggtitle("in patient care (% health spending)") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
   annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
-           label = "Countries: GBR",
+           label = "Countries: AUT, CAN, DNK, FIN, FRA, DEU, NLD, NOR, SWE, CHE, GBR",
            size = 3)

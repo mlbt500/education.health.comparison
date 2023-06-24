@@ -16,8 +16,7 @@ TIMSS_M4 <- read.csv(".\\data\\TIMSS_M_4_2019.csv")
 PISA_R <- read.csv(".\\data\\PISA_reading.csv")
 PISA_M <- read.csv(".\\data\\PISA_maths.csv")
 PISA_S <- read.csv(".\\data\\PISA_science.csv")
-
-##data frames
+OECD_health_fun <- read.csv(".\\data\\OECD_health_functions.csv")
 
 # Define JBM peers
 JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE")
@@ -451,4 +450,81 @@ ggplot(COE, aes(x = Year, y = Value, color = Study, group = Study)) +
   ggtitle("Robert Coe graph -- extended for Coalition/Con governments") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+
+# health functions
+JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE")
+fun <- OECD_health_fun[OECD_health_fun$LOCATION %in% JBM_peers,]
+
+prev <- fun[fun$Function == "Preventive care" & fun$Measure == "Share of current expenditure on health" & fun$Financing.scheme == "All financing schemes" & fun$Provider == "All providers" & fun$Year %in% 2013:2019,]
+prev1 <- prev[,c(9, 12, 13)]
+average_df <- prev1 %>%
+  group_by(Year) %>%
+  summarise(Value = mean(Value, na.rm = TRUE)) %>%
+  mutate(LOCATION = "AVE")
+prev2 <- rbind(prev1, average_df)
+
+
+# Group and summarize the data
+agg_data <- prev2 %>%
+  group_by(Year) %>%
+  summarise(mean_value = mean(Value),
+            min_value = min(Value),
+            max_value = max(Value))
+
+# Create a new variable 'LineType' in 'agg_data' for legend display
+agg_data <- agg_data %>%
+  mutate(LineType = "Mean")
+
+# Plot
+ggplot() +
+  geom_ribbon(data = agg_data, aes(x = Year, ymin = min_value, ymax = max_value),
+              fill = "darkgrey", alpha = 0.2) +
+  geom_line(data = prev2, aes(x = Year, y = Value, color = LOCATION), size = 1.5) +
+  geom_line(data = agg_data, aes(x = Year, y = mean_value, color = "Mean"), linetype = "dashed", size = 1.5) +
+  geom_point(data = prev2, aes(x = Year, y = Value, color = LOCATION)) +
+  scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
+  labs(x = "Year", y = "Value", color = "LOCATION") +
+  ggtitle("preventative care (% health spending)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
+           label = "Countries: AUT, CAN, DNK, FIN, FRA, DEU, NLD, NOR, SWE, CHE, GBR",
+           size = 3)
+
+in_pat <- fun[fun$Function == "Inpatient curative and rehabilitative care" & fun$Measure == "Share of current expenditure on health" & fun$Financing.scheme == "All financing schemes" & fun$Provider == "All providers" & fun$Year %in% 2013:2019,]
+in_pat1 <- in_pat[,c(9, 12, 13)]
+average_df <- in_pat1 %>%
+  group_by(Year) %>%
+  summarise(Value = mean(Value, na.rm = TRUE)) %>%
+  mutate(LOCATION = "AVE")
+in_pat2 <- rbind(in_pat1, average_df)
+
+# Group and summarize the data
+agg_data <- in_pat2 %>%
+  group_by(Year) %>%
+  summarise(mean_value = mean(Value),
+            min_value = min(Value),
+            max_value = max(Value))
+
+# Create a new variable 'LineType' in 'agg_data' for legend display
+agg_data <- agg_data %>%
+  mutate(LineType = "Mean")
+
+# Plot
+ggplot() +
+  geom_ribbon(data = agg_data, aes(x = Year, ymin = min_value, ymax = max_value),
+              fill = "darkgrey", alpha = 0.2) +
+  geom_line(data = in_pat2, aes(x = Year, y = Value, color = LOCATION), size = 1.5) +
+  geom_line(data = agg_data, aes(x = Year, y = mean_value, color = "Mean"), linetype = "dashed", size = 1.5) +
+  geom_point(data = in_pat2, aes(x = Year, y = Value, color = LOCATION)) +
+  scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
+  labs(x = "Year", y = "Value", color = "LOCATION") +
+  ggtitle("in patient care (% health spending)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
+           label = "Countries: AUT, CAN, DNK, FIN, FRA, DEU, NLD, NOR, SWE, CHE, GBR",
+           size = 3)
+
+## world bank ppp
 

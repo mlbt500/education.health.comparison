@@ -17,7 +17,7 @@ PISA_R <- read.csv(".\\data\\PISA_reading.csv")
 PISA_M <- read.csv(".\\data\\PISA_maths.csv")
 PISA_S <- read.csv(".\\data\\PISA_science.csv")
 OECD_health_fun <- read.csv(".\\data\\OECD_health_functions.csv")
-
+WB_PPP <- read.csv(".\\data\\wb_ppp.csv", header = FALSE)
 # Define JBM peers
 JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE")
 
@@ -527,4 +527,47 @@ ggplot() +
            size = 3)
 
 ## world bank ppp
+JBM_peers <- c("GBR", "AUT", "CAN", "DNK", "DEU", "FIN", "FRA", "NLD", "NOR", "SWE", "CHE")
+WB_PPP1 <- WB_PPP[-c(1:2),-c(1,3,4, 5:44, 65:68)]
+col_names <- WB_PPP1[1,]
+WB_PPP2 <- WB_PPP1[-1,]
+colnames(WB_PPP2) <- col_names
+WB_PPP3 <- WB_PPP2[WB_PPP2$`Country Code` %in% JBM_peers,]
+WB_PPP4 <- WB_PPP3 %>% pivot_longer(cols = -1, names_to = "Year", values_to = "Value")
+average_df <- WB_PPP4 %>%
+  group_by(Year) %>%
+  summarise(Value = mean(Value, na.rm = TRUE)) %>%
+  mutate("Country Code" = "Ave")
+WB_PPP5 <- rbind(WB_PPP4, average_df)
 
+# Group and summarize the data
+agg_data <- WB_PPP5 %>%
+  group_by(Year) %>%
+  summarise(mean_value = mean(Value),
+            min_value = min(Value),
+            max_value = max(Value))
+
+# Create a new variable 'LineType' in 'agg_data' for legend display
+agg_data <- agg_data %>%
+  mutate(LineType = "Mean")
+
+# Create a filter for the countries of interest
+countries_of_interest <- c("GBR")
+
+# Filter the data for the countries of interest
+filtered_data <- WB_PPP5 %>%
+  filter(`Country Code` %in% countries_of_interest)
+
+# Plot
+ggplot() +
+  geom_line(data = filtered_data, aes(x = Year, y = Value, color = `Country Code`), size = 1.5) +
+  geom_point(data = filtered_data, aes(x = Year, y = Value, color = `Country Code`)) +
+  geom_line(data = agg_data, aes(x = Year, y = mean_value, color = LineType), linetype = "dashed", size = 1.5) +
+  scale_color_manual(values = c("GBR" = "red", "Mean" = "black"), labels = c("GBR", "Mean")) +
+  labs(x = "Year", y = "Value", color = "Country Code") +
+  ggtitle("Health Spending Per Capita, PPP") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  annotate("text", x = Inf, y = -Inf, vjust = -1, hjust = 1, 
+           label = "Countries: GBR",
+           size = 3)
